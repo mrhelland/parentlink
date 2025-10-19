@@ -114,31 +114,44 @@ if ($data = $mform->get_data()) {
         $user->password = $temppass;
         $user->forcepasswordchange = 0;
 
-        // Begin a database transaction
-        $transaction = $DB->start_delegated_transaction();
+        try {
+            // Begin a database transaction
+            $transaction = $DB->start_delegated_transaction();
 
-        // create a new Moodle user in this transaction
-        $userid = user_create_user($user, true, true);
+            // create a new Moodle user in this transaction
+            $userid = user_create_user($user, true, true);
 
-        //print_object($userid);
+            //print_object($userid);
 
-        // Assign parent role to all selected students.
-        $parentrole = $DB->get_record('role', ['shortname' => 'parent'], '*', MUST_EXIST);
-        foreach ($studentids as $sid) {
-            $context = context_user::instance($sid);
-            // Avoid duplicate assignment if it already exists.
-            if (!$DB->record_exists('role_assignments', [
-                'roleid' => $parentrole->id,
-                'userid' => $userid,
-                'contextid' => $context->id
-            ])) {
-                role_assign($parentrole->id, $userid, $context->id);               
+            // Assign parent role to all selected students.
+            $parentrole = $DB->get_record('role', ['shortname' => 'parent'], '*', MUST_EXIST);
+            foreach ($studentids as $sid) {
+                $context = context_user::instance($sid);
+                // Avoid duplicate assignment if it already exists.
+                if (!$DB->record_exists('role_assignments', [
+                    'roleid' => $parentrole->id,
+                    'userid' => $userid,
+                    'contextid' => $context->id
+                ])) {
+                    role_assign($parentrole->id, $userid, $context->id);               
+                }
             }
+
+            //print_object($transaction);
+            // Commit transaction after user and roles are fully assigned
+            $transaction->allow_commit();            
+        } catch (Exception $e) {
+            if(!empty($transaction)) {
+                $transaction->rollback($e);
+            }
+            redirect(
+                new moodle_url('/local/parentlink/index.php'),
+                get_string('errorcreatingparent', 'local_parentlink'),
+                5,
+                \core\output\notification::NOTIFY_ERROR
+            );
         }
 
-        //print_object($transaction);
-        // Commit transaction after user and roles are fully assigned
-        $transaction->allow_commit();
 
         // Generate email template.
         $support = core_user::get_support_user();
@@ -168,8 +181,6 @@ if ($data = $mform->get_data()) {
             0,
             \core\output\notification::NOTIFY_SUCCESS
         );
-
-
 
     }
 }
