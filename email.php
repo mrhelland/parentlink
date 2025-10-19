@@ -27,7 +27,7 @@ if (!empty($emailtemplate)) {
     echo html_writer::start_div('card shadow-sm p-3 mt-3');
     echo html_writer::tag('textarea', $emailtemplate, [
         'readonly' => 'readonly',
-        'rows' => 12,
+        'rows' => 20,
         'cols' => 80,
         'id' => 'emailtemplate',
         'class' => 'form-control mb-3'
