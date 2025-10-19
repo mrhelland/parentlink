@@ -119,6 +119,7 @@ if ($data = $mform->get_data()) {
         // create a new Moodle user in this transaction
         $userid = user_create_user($user, true, true);
 
+        print_object($userid);
 
         // Assign parent role to all selected students.
         $parentrole = $DB->get_record('role', ['shortname' => 'parent'], '*', MUST_EXIST);
@@ -130,10 +131,11 @@ if ($data = $mform->get_data()) {
                 'userid' => $userid,
                 'contextid' => $context->id
             ])) {
-                role_assign($parentrole->id, $userid, $context->id);
+                role_assign($parentrole->id, $userid, $context->id);               
             }
         }
 
+        print_object($transaction);
         // Commit transaction after user and roles are fully assigned
         $transaction->allow_commit();
 

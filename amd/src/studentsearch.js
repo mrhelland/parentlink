@@ -5,7 +5,7 @@
  *
  * Enables AJAX-powered student searching for the Parent Link Manager form.
  */
-define(['jquery'], function($) {
+define(['jquery', 'core/notification'], function($, Notification) {
 
       /**
      * Initializes the student search field to perform AJAX lookups and
@@ -67,9 +67,11 @@ define(['jquery'], function($) {
                     }).get());
 
                     if (results.length === 0) {
-                        listbox.append(
-                            $('<option>', { text: 'No results found', disabled: true })
-                        );
+                        Notification.addNotification({
+                            message: 'No students found matching your search.',
+                            type: 'warning'
+                        });
+                        return;
                     } else {
                         results.forEach(function(item) {
                             if (!existingIds.has(String(item.id))) {
@@ -83,10 +85,11 @@ define(['jquery'], function($) {
                     listbox.trigger('change'); // Refresh enhanced widgets
                 },
                 error: function() {
-                    listbox.empty().append(
-                        $('<option>', { text: 'Search failed', disabled: true })
-                    );
-                    alert('Search failed. Please try again.');
+                    Notification.addNotification({
+                        message: 'An error occurred while searching.',
+                        type: 'error'
+                    });
+                    return;
                 }
             });
         }
