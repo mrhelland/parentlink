@@ -16,7 +16,7 @@ require_once(__DIR__ . '/lib.php');
 
 
 $search = optional_param('studentsearch', '', PARAM_RAW);
-$previousids = (array)optional_param('studentids', [], PARAM_INT);
+$previousids = (array)optional_param_array('studentids', [], PARAM_INT);
 $students = [];
 
 // Rebuild existing selected students so they stay visible.
@@ -109,9 +109,9 @@ if ($data = $mform->get_data()) {
         $user->policyagreed = 1;
         $user->timecreated = time();
         $user->timemodified = time();
-        $temppass = generate_password(8);
-        $user->password = hash_internal_user_password($temppass);
-        $user->forcepasswordchange = 1;
+        $temppass = generate_password(12);
+        $user->password = $temppass;
+        $user->forcepasswordchange = 0;
 
         // Begin a database transaction
         $transaction = $DB->start_delegated_transaction();
@@ -119,7 +119,7 @@ if ($data = $mform->get_data()) {
         // create a new Moodle user in this transaction
         $userid = user_create_user($user, true, true);
 
-        print_object($userid);
+        //print_object($userid);
 
         // Assign parent role to all selected students.
         $parentrole = $DB->get_record('role', ['shortname' => 'parent'], '*', MUST_EXIST);
@@ -135,7 +135,7 @@ if ($data = $mform->get_data()) {
             }
         }
 
-        print_object($transaction);
+        //print_object($transaction);
         // Commit transaction after user and roles are fully assigned
         $transaction->allow_commit();
 
