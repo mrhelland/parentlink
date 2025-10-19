@@ -37,6 +37,7 @@ $string['missinglastname'] = 'Last name is required.';
 $string['missingemail'] = 'Email address is required.';
 $string['invalidemail'] = 'Please enter a valid email address.';
 $string['parentcreatedsuccess'] = 'Parent account created successfully.';
+$string['errorcreatingparent'] = "An error occurred while creating the parent account or establishing parent roles with the students.";
 
 
 
