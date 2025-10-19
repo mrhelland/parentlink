@@ -14,9 +14,10 @@ class addparent_form extends \moodleform {
         $mform = $this->_form;
 
         // === Search section ===
-        $mform->addElement('header', 'searchhdr', get_string('searchstudents', 'local_parentlink'));
+        $mform->addElement('header', 'searchhdr', get_string('searchheader', 'local_parentlink'));
 
-        $mform->addElement('text', 'studentsearch', get_string('searchstudents', 'local_parentlink'));
+        $mform->addElement('text', 'studentsearch', get_string('studentsearch', 'local_parentlink'));
+        $mform->addHelpButton('studentsearch', 'studentsearch', 'local_parentlink');
         $mform->setType('studentsearch', PARAM_TEXT);
 
 
@@ -38,9 +39,11 @@ class addparent_form extends \moodleform {
         );
         $select->setMultiple(true);
         $mform->setType('studentids', PARAM_INT);
+        $mform->addHelpButton('studentids', 'selectstudent', 'local_parentlink');
 
         // === Parent details section ===
         $mform->addElement('header', 'parenthdr', get_string('addparent', 'local_parentlink'));
+        $mform->addHelpButton('parenthdr', 'addparent', 'local_parentlink');
 
         $mform->addElement('text', 'firstname', get_string('firstname', 'local_parentlink'));
         $mform->setType('firstname', PARAM_NOTAGS);

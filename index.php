@@ -15,7 +15,7 @@ require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/lib.php');
 
 
-$search = optional_param('studentsearch', '', PARAM_RAW);
+$search = optional_param('studentsearch', '', PARAM_TEXT);
 $previousids = (array)optional_param_array('studentids', [], PARAM_INT);
 $students = [];
 
@@ -31,14 +31,15 @@ if (!empty($previousids)) {
 
 // Add search results (merge without overwriting existing ones).
 if (!empty($search)) {
+    $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
     $searchlike = '%' . $DB->sql_like_escape($search) . '%';
     $found = $DB->get_records_sql_menu("
         SELECT id, CONCAT(firstname, ' ', lastname) AS fullname
           FROM {user}
          WHERE deleted = 0
            AND id IN (SELECT userid FROM {role_assignments} WHERE roleid = ?)
-           AND (firstname LIKE ? OR lastname LIKE ?)",
-        [5, $searchlike, $searchlike]);
+           AND (LOWER(firstname) LIKE ? OR LOWER(lastname) LIKE ?)",
+        [$studentroleid, $searchlike, $searchlike]);
 
     $students = $students + $found; // merge arrays, preserving previous ones
 }
